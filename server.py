@@ -9,6 +9,7 @@ class Server:
         self.PORT = 2121
         self.SERVER = '192.168.1.103'
         self.ADDR = (self.SERVER, self.PORT)
+        self.CONN_LIST = {}
 
     def create_socket(self):
         """Metoda tworzy socket."""
@@ -16,6 +17,7 @@ class Server:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except socket.error as msg:
             print("Socket creation error: " + str(msg))
+
     def bind_socket(self):
         """Metoda binduje socket."""
         try:
@@ -23,9 +25,18 @@ class Server:
         except:
             print("Binding socket error")
 
+    def active_conn(self):
+        print("Wypisuje liste aktywnych polaczen:")
+        print(f"[ACTIVE CONNETCTIONS] {threading.activeCount() - 1}")
+        for x in self.CONN_LIST:
+            print(x)
+
+    def send_private_msg(self, conn):
+        conn.send("private message.".encode(Consts.FORMAT))
+
     def handle_client(self, conn, addr):
         """Metoda utrzymuje połączenie z klientem."""
-        print("[NEW CONNECTION] {} connected.", addr)
+        print(f"[NEW CONNECTION] {addr} connected.")
         connected = True
         try:
             while connected:
@@ -40,7 +51,9 @@ class Server:
                     conn.send("Msg received".encode(Consts.FORMAT))
         except:
             print("Client error: %s:%d" % (addr[0], addr[1]))
-        conn.close()
+
+        self.CONN_LIST.pop(addr)  # usuwamy socket z listy aktywnych połączeń
+        conn.close()  # zamykamy połączenie
 
     def start(self):  # handle new connection
         """Metoda nawiązuje połączenie z klienetem i tworzy nowe wątki."""
@@ -50,11 +63,12 @@ class Server:
             while True:
                 conn, addr = self.server.accept()  # conn = socket that alowes us to connect back,
                 # addr = informaton about connection (port, ip adress)
+                self.CONN_LIST[addr] = conn
                 print("[CONNECTION ACCEPTED]: %s:%d" % (addr[0], addr[1]))
                 conn.send("Msg received".encode(Consts.FORMAT))
                 thread = threading.Thread(target=self.handle_client, args=(conn, addr))
                 thread.start()
-                print(f"[ACTIVE CONNETCTIONS] {threading.activeCount() - 1}")
+                self.active_conn()
         except:
             print("Error start fum")
 
