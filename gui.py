@@ -8,6 +8,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QIcon
 
 
 class Ui_MainWindow(object):
@@ -54,26 +56,34 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        self.on_off_button.clicked.connect(self.show_img_server_on)
+
+        self.on_off_button.setIcon(QIcon("assets/icons8-shutdown-80"))
+        self.on_off_button.setIconSize(QSize(80,80))
+        self.on_off_button.setStyleSheet("border: none;")
+        #self.on_off_button.setStyleSheet("background-image : assets/icons8-shutdown-80;")
+        #self.on_off_button.setStyleSheet("background-color : red;")
+        # setting checkable to true
+        self.on_off_button.setCheckable(True)
+        self.on_off_button.clicked.connect(self.server_on_off)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.on_off_button.setText(_translate("MainWindow", "PushButton"))
+        self.on_off_button.setText(_translate("MainWindow", ""))
         self.label_server.setText(_translate("MainWindow", "Server"))
         self.on_off_info.setText(_translate("MainWindow", "OFF"))
         self.menuServer.setTitle(_translate("MainWindow", "Server"))
         self.menuClient.setTitle(_translate("MainWindow", "Client"))
 
-    def show_img_server_on(self):
-        self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-on-80.png"))
-        _translate = QtCore.QCoreApplication.translate
-        self.on_off_info.setText(_translate("MainWindow", "ON"))
-
-    def show_img_server_off(self):
-        self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-off-80.png"))
-        _translate = QtCore.QCoreApplication.translate
-        self.on_off_info.setText(_translate("MainWindow", "OFF"))
+    def server_on_off(self):
+        if self.on_off_button.isChecked():
+            self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-on-80.png"))
+            _translate = QtCore.QCoreApplication.translate
+            self.on_off_info.setText(_translate("MainWindow", "ON"))
+        else:
+            self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-off-80.png"))
+            _translate = QtCore.QCoreApplication.translate
+            self.on_off_info.setText(_translate("MainWindow", "OFF"))
 
 if __name__ == "__main__":
     import sys
