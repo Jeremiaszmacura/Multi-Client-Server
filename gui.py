@@ -1,8 +1,12 @@
+"""Moduł zawiera klasę GUI."""
+import threading
+
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
 
 from server import Server
+from const import Consts
 
 class Ui_MainWindow(object):
     """Klasa zawiera zmienne i metody tworzące GUI."""
@@ -14,26 +18,30 @@ class Ui_MainWindow(object):
         self.label_02 = QtWidgets.QLabel("{}".format(1, 0, 1, 1))
         self.label_03 = QtWidgets.QLabel("{}".format(0, 1, 2, 1))
         self.label_04 = QtWidgets.QLabel("{}".format(2, 0, 1, 2))
+        self.timer = QtCore.QTimer()
         self.font = QtGui.QFont()
         self.server = Server()
 
     def setupUi(self):
         """Metoda tworzy obiekty widgetów w odpowiednich kontenerach."""
+        # Główne okno
         self.MainWindow.setObjectName("MainWindow")
         self.MainWindow.resize(800, 600)
         self.widgets.setObjectName("centralwidget")
         self.MainWindow.setCentralWidget(self.widgets)
-
         # Układ
-        self.label_01.setStyleSheet("background-color: #fcfcfc")
+        self.label_01.setStyleSheet("background-color: {}".format(Consts.LABEL_01_COLOR))
         self.layout.addWidget(self.label_01, 0, 0, 1, 1)
-        self.label_02.setStyleSheet("background-color: #f5f5f5")
+        self.label_02.setStyleSheet("background-color: {}".format(Consts.LABEL_02_COLOR))
         self.layout.addWidget(self.label_02, 1, 0, 1, 1)
-        self.label_03.setStyleSheet("background-color: #ededed")
+        self.label_03.setStyleSheet("background-color: {}".format(Consts.LABEL_03_COLOR))
         self.layout.addWidget(self.label_03, 0, 1, 2, 1)
-        self.label_04.setStyleSheet("background-color: #e0e0e0")
+        self.label_04.setStyleSheet("background-color: {}".format(Consts.LABEL_04_COLOR))
         self.layout.addWidget(self.label_04, 2, 0, 1, 2)
-
+        # Timer
+        self.timer.setInterval(50)
+        self.timer.timeout.connect(self.active_connection_list_gui)
+        self.timer.start()
         # Inicjalizacja zmiennych
         self.on_off_button = QtWidgets.QPushButton(self.widgets)
         self.on_off_img = QtWidgets.QLabel(self.widgets)
@@ -61,7 +69,7 @@ class Ui_MainWindow(object):
         self.font.setPointSize(12)
         self.on_off_info.setFont(self.font)
         self.on_off_info.setObjectName("on_off_info")
-
+        # Pozostałe
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 
@@ -90,7 +98,12 @@ class Ui_MainWindow(object):
             self.on_off_info.setText(_translate("MainWindow", "OFF"))
             self.server.stop_server()
 
-
-
-
-
+    def active_connection_list_gui(self):
+        """Metoda wyświetla listę aktywnych połączeń."""
+        if threading.activeCount() <= 2:
+            self.label_03.setText("[ACTIVE CONNETCTIONS] 0")
+        else:
+            self.label_03.setText(f"[ACTIVE CONNETCTIONS] {threading.activeCount() - 3}")
+        for connection in self.server.CONN_LIST:
+            self.label_03.append(f"{connection}")
+        #self.label_03.setAlignment(Qt.AlignCenter)

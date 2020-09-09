@@ -1,6 +1,7 @@
 """Moduł zawiera klasę Server."""
 import socket
 import threading
+
 from const import Consts
 
 class Server:
@@ -27,7 +28,7 @@ class Server:
             print("Binding socket error")
 
     def active_conn(self):
-        print(f"[ACTIVE CONNETCTIONS] {threading.activeCount() - 1}")
+        print(f"[ACTIVE CONNETCTIONS] {threading.activeCount() - 2}")
         for x in self.CONN_LIST:
             print(x)
 
@@ -67,7 +68,7 @@ class Server:
                 conn.send("Msg received".encode(Consts.FORMAT))
                 thread = threading.Thread(target=self.handle_client, args=(conn, addr))
                 thread.start()
-                self.active_conn()
+                #self.active_conn()
         except:
             print("Error start fun in server module")
 
@@ -75,6 +76,7 @@ class Server:
         """Metoda tworzy nowy socket i nowy wątek."""
         self.create_socket()
         self.bind_socket()
+        self.running = True
         print("[STARTING] server is starting...")
         threading.Thread(target=self.start).start()
 

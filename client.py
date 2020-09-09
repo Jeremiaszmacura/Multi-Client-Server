@@ -33,4 +33,15 @@ class Client():
         self.client.send(message)
         print(self.client.recv(2048).decode(Consts.FORMAT))
 
+def start_client():
+    """Metoda zawiera testowe połączenie."""
+    client = Client()
+    client.create_socket()
+    client.connect_socket()
+    client.send("Hello World!")
+    input()
+    client.send("Next message :)")
+    input()
+    client.send(Consts.DISCONNECT_MESSAGE)
 
+start_client()
