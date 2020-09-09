@@ -1,95 +1,96 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'gui_01.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.2
-#
-# WARNING! All changes made in this file will be lost!
-
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QIcon
 
+from server import Server
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(308, 281)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.on_off_button = QtWidgets.QPushButton(self.centralwidget)
-        self.on_off_button.setGeometry(QtCore.QRect(50, 110, 81, 81))
+    """Klasa zawiera zmienne i metody tworzące GUI."""
+    def __init__(self):
+        self.MainWindow = QtWidgets.QMainWindow()
+        self.widgets = QtWidgets.QWidget(self.MainWindow)
+        self.layout = QtWidgets.QGridLayout(self.widgets)
+        self.label_01 = QtWidgets.QLabel("{}".format(0, 0, 1, 1))
+        self.label_02 = QtWidgets.QLabel("{}".format(1, 0, 1, 1))
+        self.label_03 = QtWidgets.QLabel("{}".format(0, 1, 2, 1))
+        self.label_04 = QtWidgets.QLabel("{}".format(2, 0, 1, 2))
+        self.font = QtGui.QFont()
+        self.server = Server()
+
+    def setupUi(self):
+        """Metoda tworzy obiekty widgetów w odpowiednich kontenerach."""
+        self.MainWindow.setObjectName("MainWindow")
+        self.MainWindow.resize(800, 600)
+        self.widgets.setObjectName("centralwidget")
+        self.MainWindow.setCentralWidget(self.widgets)
+
+        # Układ
+        self.label_01.setStyleSheet("background-color: #fcfcfc")
+        self.layout.addWidget(self.label_01, 0, 0, 1, 1)
+        self.label_02.setStyleSheet("background-color: #f5f5f5")
+        self.layout.addWidget(self.label_02, 1, 0, 1, 1)
+        self.label_03.setStyleSheet("background-color: #ededed")
+        self.layout.addWidget(self.label_03, 0, 1, 2, 1)
+        self.label_04.setStyleSheet("background-color: #e0e0e0")
+        self.layout.addWidget(self.label_04, 2, 0, 1, 2)
+
+        # Inicjalizacja zmiennych
+        self.on_off_button = QtWidgets.QPushButton(self.widgets)
+        self.on_off_img = QtWidgets.QLabel(self.widgets)
+        self.label_server = QtWidgets.QLabel(self.widgets)
+        self.on_off_info = QtWidgets.QLabel(self.widgets)
+        # Przycisk on-off
+        self.on_off_button.setGeometry(QtCore.QRect(80, 90, 81, 81))
         self.on_off_button.setObjectName("on_off_button")
-        self.on_off_img = QtWidgets.QLabel(self.centralwidget)
-        self.on_off_img.setGeometry(QtCore.QRect(170, 130, 81, 51))
-        self.on_off_img.setText("")
-        self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-off-80.png"))
-        self.on_off_img.setObjectName("on_off_img")
-        self.label_server = QtWidgets.QLabel(self.centralwidget)
-        self.label_server.setGeometry(QtCore.QRect(110, 10, 81, 71))
-        font = QtGui.QFont()
-        font.setPointSize(20)
-        self.label_server.setFont(font)
-        self.label_server.setObjectName("label_server")
-        self.on_off_info = QtWidgets.QLabel(self.centralwidget)
-        self.on_off_info.setGeometry(QtCore.QRect(200, 180, 41, 16))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.on_off_info.setFont(font)
-        self.on_off_info.setObjectName("on_off_info")
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 308, 21))
-        self.menubar.setObjectName("menubar")
-        self.menuServer = QtWidgets.QMenu(self.menubar)
-        self.menuServer.setObjectName("menuServer")
-        self.menuClient = QtWidgets.QMenu(self.menubar)
-        self.menuClient.setObjectName("menuClient")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        self.menubar.addAction(self.menuServer.menuAction())
-        self.menubar.addAction(self.menuClient.menuAction())
-
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-
         self.on_off_button.setIcon(QIcon("assets/icons8-shutdown-80"))
-        self.on_off_button.setIconSize(QSize(80,80))
+        self.on_off_button.setIconSize(QSize(80, 80))
         self.on_off_button.setStyleSheet("border: none;")
-        #self.on_off_button.setStyleSheet("background-image : assets/icons8-shutdown-80;")
-        #self.on_off_button.setStyleSheet("background-color : red;")
-        # setting checkable to true
         self.on_off_button.setCheckable(True)
         self.on_off_button.clicked.connect(self.server_on_off)
+        # Ikona pokazująca stan on-off
+        self.on_off_img.setGeometry(QtCore.QRect(220, 110, 81, 51))
+        self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-off-80.png"))
+        self.on_off_img.setObjectName("on_off_img")
+        # Napis Server
+        self.label_server.setGeometry(QtCore.QRect(160, 10, 100, 71))
+        self.font.setPointSize(20)
+        self.label_server.setFont(self.font)
+        self.label_server.setObjectName("label_server")
+        # Napis on-off
+        self.on_off_info.setGeometry(QtCore.QRect(247, 160, 41, 16))
+        self.font.setPointSize(12)
+        self.on_off_info.setFont(self.font)
+        self.on_off_info.setObjectName("on_off_info")
 
-    def retranslateUi(self, MainWindow):
+        self.retranslateUi()
+        QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
+
+    def retranslateUi(self):
+        """Funkcja ustawia napisy i tytuły widżetów."""
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.on_off_button.setText(_translate("MainWindow", ""))
         self.label_server.setText(_translate("MainWindow", "Server"))
         self.on_off_info.setText(_translate("MainWindow", "OFF"))
-        self.menuServer.setTitle(_translate("MainWindow", "Server"))
-        self.menuClient.setTitle(_translate("MainWindow", "Client"))
+        self.label_01.setText(_translate("MainWindow", ""))
+        self.label_02.setText(_translate("MainWindow", ""))
+        self.label_03.setText(_translate("MainWindow", ""))
+        self.label_04.setText(_translate("MainWindow", ""))
 
     def server_on_off(self):
+        """Metoda odpowiada za włączanie i wyłączanie serwera."""
         if self.on_off_button.isChecked():
             self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-on-80.png"))
             _translate = QtCore.QCoreApplication.translate
             self.on_off_info.setText(_translate("MainWindow", "ON"))
+            self.server.start_server()
         else:
             self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-off-80.png"))
             _translate = QtCore.QCoreApplication.translate
             self.on_off_info.setText(_translate("MainWindow", "OFF"))
+            self.server.stop_server()
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+
+
+
+

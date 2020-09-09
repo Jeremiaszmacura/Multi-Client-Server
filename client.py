@@ -33,11 +33,4 @@ class Client():
         self.client.send(message)
         print(self.client.recv(2048).decode(Consts.FORMAT))
 
-client = Client()
-client.create_socket()
-client.connect_socket()
-client.send("Hello World!")
-input()
-client.send("Nygga")
-input()
-client.send(Consts.DISCONNECT_MESSAGE)
+

@@ -6,6 +6,7 @@ from const import Consts
 class Server:
     """Klasa serwera zawiera metody potrzebne do obługi serwera."""
     def __init__(self):
+        self.running = False
         self.PORT = 2121
         self.SERVER = '192.168.1.103'
         self.ADDR = (self.SERVER, self.PORT)
@@ -14,19 +15,18 @@ class Server:
     def create_socket(self):
         """Metoda tworzy socket."""
         try:
-            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except socket.error as msg:
             print("Socket creation error: " + str(msg))
 
     def bind_socket(self):
         """Metoda binduje socket."""
         try:
-            self.server.bind(self.ADDR)
+            self.server_socket.bind(self.ADDR)
         except:
             print("Binding socket error")
 
     def active_conn(self):
-        print("Wypisuje liste aktywnych polaczen:")
         print(f"[ACTIVE CONNETCTIONS] {threading.activeCount() - 1}")
         for x in self.CONN_LIST:
             print(x)
@@ -52,17 +52,16 @@ class Server:
         except:
             print("Client error: %s:%d" % (addr[0], addr[1]))
 
-        self.CONN_LIST.pop(addr)  # usuwamy socket z listy aktywnych połączeń
-        conn.close()  # zamykamy połączenie
+        self.CONN_LIST.pop(addr)
+        conn.close()
 
-    def start(self):  # handle new connection
+    def start(self):
         """Metoda nawiązuje połączenie z klienetem i tworzy nowe wątki."""
-        self.server.listen()
+        self.server_socket.listen()
         print(f"[LISTENING] Server is listening on {self.SERVER}")
         try:
-            while True:
-                conn, addr = self.server.accept()  # conn = socket that alowes us to connect back,
-                # addr = informaton about connection (port, ip adress)
+            while self.running:
+                conn, addr = self.server_socket.accept()
                 self.CONN_LIST[addr] = conn
                 print("[CONNECTION ACCEPTED]: %s:%d" % (addr[0], addr[1]))
                 conn.send("Msg received".encode(Consts.FORMAT))
@@ -70,15 +69,16 @@ class Server:
                 thread.start()
                 self.active_conn()
         except:
-            print("Error start fum")
+            print("Error start fun in server module")
 
-def main():
-    """Funkcja main programu."""
-    print("[STARTING] server is starting...")
-    server = Server()
-    server.create_socket()
-    server.bind_socket()
-    server.start()
+    def start_server(self):
+        """Metoda tworzy nowy socket i nowy wątek."""
+        self.create_socket()
+        self.bind_socket()
+        print("[STARTING] server is starting...")
+        threading.Thread(target=self.start).start()
 
-if __name__ == '__main__':
-    main()
+    def stop_server(self):
+        """Metoda zamyka socket servera."""
+        print("[STOP] server is stopped.")
+        self.server_socket.close()
