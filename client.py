@@ -2,8 +2,10 @@
 import socket
 from const import Consts
 
+
 class Client():
     """Klasa Client zawiera metody potrzebne do obługi klienta."""
+
     def __init__(self):
         self.PORT = 2121
         self.SERVER = '192.168.1.103'
@@ -33,6 +35,7 @@ class Client():
         self.client.send(message)
         print(self.client.recv(2048).decode(Consts.FORMAT))
 
+
 def start_client():
     """Metoda zawiera testowe połączenie."""
     client = Client()
@@ -43,5 +46,6 @@ def start_client():
     client.send("Next message :)")
     input()
     client.send(Consts.DISCONNECT_MESSAGE)
+
 
 start_client()

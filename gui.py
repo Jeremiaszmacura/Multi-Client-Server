@@ -3,13 +3,16 @@ import threading
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtWidgets import QTextEdit, QVBoxLayout
 
 from server import Server
 from const import Consts
 
+
 class Ui_MainWindow(object):
     """Klasa zawiera zmienne i metody tworzące GUI."""
+
     def __init__(self):
         self.MainWindow = QtWidgets.QMainWindow()
         self.widgets = QtWidgets.QWidget(self.MainWindow)
@@ -18,8 +21,10 @@ class Ui_MainWindow(object):
         self.label_02 = QtWidgets.QLabel("{}".format(1, 0, 1, 1))
         self.label_03 = QtWidgets.QLabel("{}".format(0, 1, 2, 1))
         self.label_04 = QtWidgets.QLabel("{}".format(2, 0, 1, 2))
+        self.layout_connetion_list = QVBoxLayout(self.MainWindow)
+        self.connection_list_widget = QTextEdit()
         self.timer = QtCore.QTimer()
-        self.font = QtGui.QFont()
+        self.font = QtGui.QFont('Times', 20, QFont.Bold)
         self.server = Server()
 
     def setupUi(self):
@@ -47,6 +52,10 @@ class Ui_MainWindow(object):
         self.on_off_img = QtWidgets.QLabel(self.widgets)
         self.label_server = QtWidgets.QLabel(self.widgets)
         self.on_off_info = QtWidgets.QLabel(self.widgets)
+        self.send_button = QtWidgets.QPushButton(self.widgets)
+        # Wysyłanie wiadomości do klienta - label_02
+        self.send_button.setGeometry(QtCore.QRect(150, 350, 100, 32))
+        self.send_button.setCheckable(True)
         # Przycisk on-off
         self.on_off_button.setGeometry(QtCore.QRect(80, 90, 81, 81))
         self.on_off_button.setObjectName("on_off_button")
@@ -60,8 +69,8 @@ class Ui_MainWindow(object):
         self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-off-80.png"))
         self.on_off_img.setObjectName("on_off_img")
         # Napis Server
-        self.label_server.setGeometry(QtCore.QRect(160, 10, 100, 71))
-        self.font.setPointSize(20)
+        self.label_server.setGeometry(QtCore.QRect(150, 15, 100, 71))
+        self.font.setPointSize(26)
         self.label_server.setFont(self.font)
         self.label_server.setObjectName("label_server")
         # Napis on-off
@@ -80,6 +89,7 @@ class Ui_MainWindow(object):
         self.on_off_button.setText(_translate("MainWindow", ""))
         self.label_server.setText(_translate("MainWindow", "Server"))
         self.on_off_info.setText(_translate("MainWindow", "OFF"))
+        self.send_button.setText(_translate("MainWindow", "Send"))
         self.label_01.setText(_translate("MainWindow", ""))
         self.label_02.setText(_translate("MainWindow", ""))
         self.label_03.setText(_translate("MainWindow", ""))
@@ -100,10 +110,12 @@ class Ui_MainWindow(object):
 
     def active_connection_list_gui(self):
         """Metoda wyświetla listę aktywnych połączeń."""
+        self.label_03.setFont(QFont('Times', 18))
         if threading.activeCount() <= 2:
-            self.label_03.setText("[ACTIVE CONNETCTIONS] 0")
+            self.label_03.setText("ACTIVE CONNETCTIONS \n\n\nnumber of connections: 0")
         else:
-            self.label_03.setText(f"[ACTIVE CONNETCTIONS] {threading.activeCount() - 3}")
-        for connection in self.server.CONN_LIST:
-            self.label_03.append(f"{connection}")
-        #self.label_03.setAlignment(Qt.AlignCenter)
+            temp_sting = "ACTIVE CONNETCTIONS \n\n\n"
+            for connection in self.server.CONN_LIST:
+                temp_sting += str(connection) + "\n"
+            self.label_03.setText(temp_sting)
+        self.label_03.setAlignment(Qt.AlignCenter)

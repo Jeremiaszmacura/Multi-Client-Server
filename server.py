@@ -4,8 +4,10 @@ import threading
 
 from const import Consts
 
+
 class Server:
     """Klasa serwera zawiera metody potrzebne do obługi serwera."""
+
     def __init__(self):
         self.running = False
         self.PORT = 2121
@@ -68,7 +70,7 @@ class Server:
                 conn.send("Msg received".encode(Consts.FORMAT))
                 thread = threading.Thread(target=self.handle_client, args=(conn, addr))
                 thread.start()
-                #self.active_conn()
+                # self.active_conn()
         except:
             print("Error start fun in server module")
 
