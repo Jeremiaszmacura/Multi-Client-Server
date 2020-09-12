@@ -4,7 +4,7 @@ import threading
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtWidgets import QTextEdit, QVBoxLayout
+from PyQt5.QtWidgets import QTextEdit, QVBoxLayout, QMessageBox
 
 from server import Server
 from const import Consts
@@ -31,7 +31,7 @@ class Ui_MainWindow(object):
         """Metoda tworzy obiekty widgetów w odpowiednich kontenerach."""
         # Główne okno
         self.MainWindow.setObjectName("MainWindow")
-        self.MainWindow.resize(800, 600)
+        self.MainWindow.setFixedSize(800, 600)
         self.widgets.setObjectName("centralwidget")
         self.MainWindow.setCentralWidget(self.widgets)
         # Układ
@@ -52,10 +52,25 @@ class Ui_MainWindow(object):
         self.on_off_img = QtWidgets.QLabel(self.widgets)
         self.label_server = QtWidgets.QLabel(self.widgets)
         self.on_off_info = QtWidgets.QLabel(self.widgets)
+        self.label_client = QtWidgets.QLabel(self.widgets)
         self.send_button = QtWidgets.QPushButton(self.widgets)
+        self.label_client_info = QtWidgets.QLabel(self.widgets)
+        self.label_information_flow = QtWidgets.QLabel(self.widgets)
         # Wysyłanie wiadomości do klienta - label_02
-        self.send_button.setGeometry(QtCore.QRect(150, 350, 100, 32))
+        self.send_button.setGeometry(QtCore.QRect(125, 340, 150, 32))
         self.send_button.setCheckable(True)
+        self.send_button.clicked.connect(self.take_send_inputs)
+        self.label_client.setGeometry(QtCore.QRect(150, 230, 100, 32))
+        self.font.setPointSize(26)
+        self.label_client.setFont(self.font)
+        self.label_client.setObjectName("label_server")
+        self.label_client_info.setGeometry(QtCore.QRect(80, 285, 310, 32))
+        self.label_client_info.setText("Send an information to client")
+        self.label_client_info.setFont(QFont('Times', 16))
+        # Przepływ informacji - label_04
+        self.label_information_flow.setGeometry(QtCore.QRect(330, 415, 200, 32))
+        self.label_information_flow.setText("Information flow")
+        self.label_information_flow.setFont(QFont('Times', 16))
         # Przycisk on-off
         self.on_off_button.setGeometry(QtCore.QRect(80, 90, 81, 81))
         self.on_off_button.setObjectName("on_off_button")
@@ -89,6 +104,7 @@ class Ui_MainWindow(object):
         self.on_off_button.setText(_translate("MainWindow", ""))
         self.label_server.setText(_translate("MainWindow", "Server"))
         self.on_off_info.setText(_translate("MainWindow", "OFF"))
+        self.label_client.setText(_translate("MainWindow", "Client"))
         self.send_button.setText(_translate("MainWindow", "Send"))
         self.label_01.setText(_translate("MainWindow", ""))
         self.label_02.setText(_translate("MainWindow", ""))
@@ -112,10 +128,46 @@ class Ui_MainWindow(object):
         """Metoda wyświetla listę aktywnych połączeń."""
         self.label_03.setFont(QFont('Times', 18))
         if threading.activeCount() <= 2:
-            self.label_03.setText("ACTIVE CONNETCTIONS \n\n\nnumber of connections: 0")
+            self.label_03.setText("ACTIVE CONNETCTIONS \n\n\nServer is not running")
         else:
-            temp_sting = "ACTIVE CONNETCTIONS \n\n\n"
+            temp_sting = "ACTIVE CONNETCTIONS ({})\n\n\n".format(threading.activeCount()-3)
             for connection in self.server.CONN_LIST:
                 temp_sting += str(connection) + "\n"
             self.label_03.setText(temp_sting)
         self.label_03.setAlignment(Qt.AlignCenter)
+
+    def information_flow_gui_list(self):
+        """Metoda wyświetla listę wysłanych i odebranych wiadomości."""
+        pass
+
+    def take_send_inputs(self):
+        """Funkcja zbiera i obsługuje dane zebrane po przysiskien Send."""
+        if not self.on_off_button.isChecked():
+            warning = QMessageBox()
+            warning.setIcon(QMessageBox.Warning)
+            warning.setText("Server is not running")
+            warning.setWindowTitle("Server is OFF")
+            warning.setStandardButtons(QMessageBox.Ok)
+            return_value = warning.exec()
+            if return_value == QMessageBox.Ok:
+                pass
+            return
+        ip = QtWidgets.QInputDialog.getText(self.widgets, 'Input Dialog', 'Enter client ip:')
+        port = QtWidgets.QInputDialog.getInt(self.widgets, 'Input Dialog', 'Enter client port:')
+        message = QtWidgets.QInputDialog.getText(self.widgets, 'Input Dialog', 'Enter message:')
+        message = message[0]
+        addr = (ip[0], port[0])
+        try:
+            conn = self.server.CONN_LIST[addr]
+            self.server.send_private_msg(conn, message)
+        except:
+            warning = QMessageBox()
+            warning.setIcon(QMessageBox.Warning)
+            warning.setText("Wrong client ip or port")
+            warning.setWindowTitle("Incorrect Data")
+            warning.setStandardButtons(QMessageBox.Ok)
+            return_value = warning.exec()
+            if return_value == QMessageBox.Ok:
+                pass
+            return
+

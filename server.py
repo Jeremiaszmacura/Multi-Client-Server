@@ -29,13 +29,10 @@ class Server:
         except:
             print("Binding socket error")
 
-    def active_conn(self):
-        print(f"[ACTIVE CONNETCTIONS] {threading.activeCount() - 2}")
-        for x in self.CONN_LIST:
-            print(x)
 
-    def send_private_msg(self, conn):
-        conn.send("private message.".encode(Consts.FORMAT))
+    def send_private_msg(self, conn, text):
+        conn.send(text.encode(Consts.FORMAT))
+        print(text)
 
     def handle_client(self, conn, addr):
         """Metoda utrzymuje połączenie z klientem."""
@@ -49,9 +46,8 @@ class Server:
                     msg = conn.recv(msg_length).decode(Consts.FORMAT)
                     if msg == Consts.DISCONNECT_MESSAGE:
                         connected = False
-
                     print(f"[{addr}] {msg}")
-                    conn.send("Msg received".encode(Consts.FORMAT))
+                    conn.send("[Server] Msg received".encode(Consts.FORMAT))
         except:
             print("Client error: %s:%d" % (addr[0], addr[1]))
 
@@ -70,7 +66,6 @@ class Server:
                 conn.send("Msg received".encode(Consts.FORMAT))
                 thread = threading.Thread(target=self.handle_client, args=(conn, addr))
                 thread.start()
-                # self.active_conn()
         except:
             print("Error start fun in server module")
 
