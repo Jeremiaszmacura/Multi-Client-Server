@@ -10,7 +10,7 @@ from server import Server
 from const import Consts
 
 
-class Ui_MainWindow(object):
+class UiMainWindow(object):
     """Klasa zawiera zmienne i metody tworzące GUI."""
 
     def __init__(self):
@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
         self.font = QtGui.QFont('Times', 20, QFont.Bold)
         self.server = Server()
 
-    def setupUi(self):
+    def set_up_ui(self):
         """Metoda tworzy obiekty widgetów w odpowiednich kontenerach."""
         # Główne okno
         self.MainWindow.setObjectName("MainWindow")
@@ -94,10 +94,10 @@ class Ui_MainWindow(object):
         self.on_off_info.setFont(self.font)
         self.on_off_info.setObjectName("on_off_info")
         # Pozostałe
-        self.retranslateUi()
+        self.retranslate_ui()
         QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 
-    def retranslateUi(self):
+    def retranslate_ui(self):
         """Funkcja ustawia napisy i tytuły widżetów."""
         _translate = QtCore.QCoreApplication.translate
         self.MainWindow.setWindowTitle(_translate("MainWindow", "Client-Server"))
@@ -131,7 +131,7 @@ class Ui_MainWindow(object):
             self.label_03.setText("ACTIVE CONNETCTIONS \n\n\nServer is not running")
         else:
             temp_sting = "ACTIVE CONNETCTIONS ({})\n\n\n".format(threading.activeCount() - 3)
-            for connection in self.server.CONN_LIST:
+            for connection in self.server.conn_list:
                 temp_sting += str(connection) + "\n"
             self.label_03.setText(temp_sting)
         self.label_03.setAlignment(Qt.AlignCenter)
@@ -163,7 +163,7 @@ class Ui_MainWindow(object):
         message = message[0]
         addr = (ip[0], port[0])
         try:
-            conn = self.server.CONN_LIST[addr]
+            conn = self.server.conn_list[addr]
             self.server.send_private_msg(addr, conn, message)
         except:
             warning = QMessageBox()

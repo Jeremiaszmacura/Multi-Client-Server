@@ -10,10 +10,7 @@ class Server:
 
     def __init__(self):
         self.running = False
-        self.PORT = 2121
-        self.SERVER = '192.168.1.103'
-        self.ADDR = (self.SERVER, self.PORT)
-        self.CONN_LIST = {}
+        self.conn_list = {}
         self.recv_and_send_msg = []
 
     def create_socket(self):
@@ -26,7 +23,7 @@ class Server:
     def bind_socket(self):
         """Metoda binduje socket."""
         try:
-            self.server_socket.bind(self.ADDR)
+            self.server_socket.bind(Consts.ADDR)
         except socket.error as msg:
             print("[SERVER] Socket binding error: " + str(msg))
 
@@ -37,7 +34,6 @@ class Server:
 
     def handle_client(self, conn, addr):
         """Metoda utrzymuje połączenie z klientem."""
-        print(f"[SERVER] {addr} connected.")
         connected = True
         try:
             while connected:
@@ -53,18 +49,20 @@ class Server:
         except:
             print("[SERVER] Client error: %s:%d" % (addr[0], addr[1]))
 
-        self.CONN_LIST.pop(addr)
+        self.conn_list.pop(addr)
         conn.close()
 
     def start(self):
         """Metoda nawiązuje połączenie z klienetem i tworzy nowe wątki."""
         self.server_socket.listen()
-        print(f"[SERVER] Server is listening on {self.SERVER}")
+        print(f"[SERVER] Server is listening on {Consts.SERVER}")
         try:
             while self.running:
                 conn, addr = self.server_socket.accept()
-                self.CONN_LIST[addr] = conn
+                self.conn_list[addr] = conn
                 print("[SERVER] Connection accepted: %s:%d" % (addr[0], addr[1]))
+                self.recv_and_send_msg.append("[SERVER] Connection accepted: %s:%d"
+                                              % (addr[0], addr[1]))
                 conn.send("Connection accepted.".encode(Consts.FORMAT))
                 thread = threading.Thread(target=self.handle_client, args=(conn, addr))
                 thread.start()
@@ -84,8 +82,8 @@ class Server:
     def stop_server(self):
         """Metoda zamyka socket servera."""
         print("[SERVER] Server is stopped.")
-        for connection in self.CONN_LIST.values():
+        for connection in self.conn_list.values():
             connection.send(Consts.DISCONNECT_MESSAGE.encode(Consts.FORMAT))
-        self.CONN_LIST.clear()
+        self.conn_list.clear()
         self.running = False
         self.server_socket.close()

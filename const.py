@@ -3,6 +3,9 @@
 
 class Consts:
     """Przechowuje stałe."""
+    PORT = 2121
+    SERVER = '192.168.1.103'
+    ADDR = (SERVER, PORT)
     HEADER = 64
     FORMAT = 'utf-8'
     DISCONNECT_MESSAGE = "DISCONNECTED"

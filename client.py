@@ -8,9 +8,6 @@ class Client:
 
     def __init__(self):
         self.connected = False
-        self.PORT = 2121
-        self.SERVER = '192.168.1.103'
-        self.ADDR = (self.SERVER, self.PORT)
 
     def create_socket(self):
         """Metoda tworzy socket."""
@@ -22,7 +19,7 @@ class Client:
     def connect_socket(self):
         """Metoda nawiązuje połączenie z serwerem."""
         try:
-            self.client.connect(self.ADDR)
+            self.client.connect(Consts.ADDR)
             self.connected = True
         except socket.error as msg:
             print("[CLIENT] Connecting socket error: " + str(msg))
