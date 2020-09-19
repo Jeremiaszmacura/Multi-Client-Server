@@ -23,7 +23,8 @@ class Ui_MainWindow(object):
         self.label_04 = QtWidgets.QLabel("{}".format(2, 0, 1, 2))
         self.layout_connetion_list = QVBoxLayout(self.MainWindow)
         self.connection_list_widget = QTextEdit()
-        self.timer = QtCore.QTimer()
+        self.timer_01 = QtCore.QTimer()
+        self.timer_02 = QtCore.QTimer()
         self.font = QtGui.QFont('Times', 20, QFont.Bold)
         self.server = Server()
 
@@ -44,9 +45,12 @@ class Ui_MainWindow(object):
         self.label_04.setStyleSheet("background-color: {}".format(Consts.LABEL_04_COLOR))
         self.layout.addWidget(self.label_04, 2, 0, 1, 2)
         # Timer
-        self.timer.setInterval(50)
-        self.timer.timeout.connect(self.active_connection_list_gui)
-        self.timer.start()
+        self.timer_01.setInterval(50)
+        self.timer_02.setInterval(50)
+        self.timer_01.timeout.connect(self.active_connection_list_gui)
+        self.timer_02.timeout.connect(self.information_flow_gui_list)
+        self.timer_01.start()
+        self.timer_02.start()
         # Inicjalizacja zmiennych
         self.on_off_button = QtWidgets.QPushButton(self.widgets)
         self.on_off_img = QtWidgets.QLabel(self.widgets)
@@ -67,10 +71,6 @@ class Ui_MainWindow(object):
         self.label_client_info.setGeometry(QtCore.QRect(80, 285, 310, 32))
         self.label_client_info.setText("Send an information to client")
         self.label_client_info.setFont(QFont('Times', 16))
-        # Przepływ informacji - label_04
-        self.label_information_flow.setGeometry(QtCore.QRect(330, 415, 200, 32))
-        self.label_information_flow.setText("Information flow")
-        self.label_information_flow.setFont(QFont('Times', 16))
         # Przycisk on-off
         self.on_off_button.setGeometry(QtCore.QRect(80, 90, 81, 81))
         self.on_off_button.setObjectName("on_off_button")
@@ -100,7 +100,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self):
         """Funkcja ustawia napisy i tytuły widżetów."""
         _translate = QtCore.QCoreApplication.translate
-        self.MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "Client-Server"))
         self.on_off_button.setText(_translate("MainWindow", ""))
         self.label_server.setText(_translate("MainWindow", "Server"))
         self.on_off_info.setText(_translate("MainWindow", "OFF"))
@@ -130,7 +130,7 @@ class Ui_MainWindow(object):
         if threading.activeCount() <= 2:
             self.label_03.setText("ACTIVE CONNETCTIONS \n\n\nServer is not running")
         else:
-            temp_sting = "ACTIVE CONNETCTIONS ({})\n\n\n".format(threading.activeCount()-3)
+            temp_sting = "ACTIVE CONNETCTIONS ({})\n\n\n".format(threading.activeCount() - 3)
             for connection in self.server.CONN_LIST:
                 temp_sting += str(connection) + "\n"
             self.label_03.setText(temp_sting)
@@ -138,7 +138,12 @@ class Ui_MainWindow(object):
 
     def information_flow_gui_list(self):
         """Metoda wyświetla listę wysłanych i odebranych wiadomości."""
-        pass
+        self.label_04.setFont(QFont('Times', 14))
+        temp_string = "Information flow\n\n"
+        for msg in self.server.recv_and_send_msg:
+            temp_string += str(msg) + "\n"
+        self.label_04.setText(temp_string)
+        self.label_04.setAlignment(Qt.AlignCenter)
 
     def take_send_inputs(self):
         """Funkcja zbiera i obsługuje dane zebrane po przysiskien Send."""
@@ -159,7 +164,7 @@ class Ui_MainWindow(object):
         addr = (ip[0], port[0])
         try:
             conn = self.server.CONN_LIST[addr]
-            self.server.send_private_msg(conn, message)
+            self.server.send_private_msg(addr, conn, message)
         except:
             warning = QMessageBox()
             warning.setIcon(QMessageBox.Warning)
@@ -170,4 +175,3 @@ class Ui_MainWindow(object):
             if return_value == QMessageBox.Ok:
                 pass
             return
-

@@ -3,7 +3,7 @@ import socket
 from const import Consts
 
 
-class Client():
+class Client:
     """Klasa Client zawiera metody potrzebne do obługi klienta."""
 
     def __init__(self):
@@ -17,35 +17,15 @@ class Client():
         try:
             self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except socket.error as msg:
-            print("Socket creation error: " + str(msg))
+            print("[CLIENT] Socket creation error: " + str(msg))
 
     def connect_socket(self):
         """Metoda nawiązuje połączenie z serwerem."""
         try:
             self.client.connect(self.ADDR)
             self.connected = True
-        except:
-            print("Connecting socket error")
-
-    # def handle_client(self, conn, addr):
-    #     """Metoda utrzymuje połączenie z klientem."""
-    #     print(f"[NEW CONNECTION] {addr} connected.")
-    #     connected = True
-    #     try:
-    #         while connected:
-    #             msg_length = conn.recv(Consts.HEADER).decode(Consts.FORMAT)
-    #             if msg_length:
-    #                 msg_length = int(msg_length)
-    #                 msg = conn.recv(msg_length).decode(Consts.FORMAT)
-    #                 if msg == Consts.DISCONNECT_MESSAGE:
-    #                     connected = False
-    #                 print(f"[{addr}] {msg}")
-    #                 conn.send("[Server] Msg received".encode(Consts.FORMAT))
-    #     except:
-    #         print("Client error: %s:%d" % (addr[0], addr[1]))
-    #
-    #     self.CONN_LIST.pop(addr)
-    #     conn.close()
+        except socket.error as msg:
+            print("[CLIENT] Connecting socket error: " + str(msg))
 
     def send_message(self, msg):
         """Metoda wysyła wiadomości do serwera."""
@@ -58,12 +38,17 @@ class Client():
         print(self.client.recv(2048).decode(Consts.FORMAT))
 
     def receive_message(self):
-            while self.connected:
-                command = self.client.recv(1024)
+        """Metoda odbiera wiadomości od serwera"""
+        while self.connected:
+            try:
+                command = self.client.recv(1024).decode(Consts.FORMAT)
                 if command == Consts.DISCONNECT_MESSAGE:
                     self.connected = False
-                print(command)
-                self.send_message("[Client] Msg received!")
+                print("[SERVER] " + str(command))
+                self.send_message("Msg received.")
+            except:
+                print("[CLIENT] receive_message function error.")
+        self.client.close()
 
 
 def start_client():

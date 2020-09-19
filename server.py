@@ -14,29 +14,30 @@ class Server:
         self.SERVER = '192.168.1.103'
         self.ADDR = (self.SERVER, self.PORT)
         self.CONN_LIST = {}
+        self.recv_and_send_msg = []
 
     def create_socket(self):
         """Metoda tworzy socket."""
         try:
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except socket.error as msg:
-            print("Socket creation error: " + str(msg))
+            print("[SERVER] Socket creation error: " + str(msg))
 
     def bind_socket(self):
         """Metoda binduje socket."""
         try:
             self.server_socket.bind(self.ADDR)
-        except:
-            print("Binding socket error")
+        except socket.error as msg:
+            print("[SERVER] Socket binding error: " + str(msg))
 
-
-    def send_private_msg(self, conn, text):
+    def send_private_msg(self, addr, conn, text):
+        """Metoda wysyła wiadomość do konkretnego użytkownika."""
         conn.send(text.encode(Consts.FORMAT))
-        print(text)
+        self.recv_and_send_msg.append(f"[SERVER] TO CLIENT {addr}: {text}")
 
     def handle_client(self, conn, addr):
         """Metoda utrzymuje połączenie z klientem."""
-        print(f"[NEW CONNECTION] {addr} connected.")
+        print(f"[SERVER] {addr} connected.")
         connected = True
         try:
             while connected:
@@ -46,10 +47,11 @@ class Server:
                     msg = conn.recv(msg_length).decode(Consts.FORMAT)
                     if msg == Consts.DISCONNECT_MESSAGE:
                         connected = False
-                    print(f"[{addr}] {msg}")
-                    conn.send("[Server] Msg received".encode(Consts.FORMAT))
+                    self.recv_and_send_msg.append(f"[CLIENT] {addr} TO SERVER: {msg}")
+                    print(f"[CLIENT] {addr}: {msg}")
+                    conn.send("[SERVER] Message received.".encode(Consts.FORMAT))
         except:
-            print("Client error: %s:%d" % (addr[0], addr[1]))
+            print("[SERVER] Client error: %s:%d" % (addr[0], addr[1]))
 
         self.CONN_LIST.pop(addr)
         conn.close()
@@ -57,27 +59,33 @@ class Server:
     def start(self):
         """Metoda nawiązuje połączenie z klienetem i tworzy nowe wątki."""
         self.server_socket.listen()
-        print(f"[LISTENING] Server is listening on {self.SERVER}")
+        print(f"[SERVER] Server is listening on {self.SERVER}")
         try:
             while self.running:
                 conn, addr = self.server_socket.accept()
                 self.CONN_LIST[addr] = conn
-                print("[CONNECTION ACCEPTED]: %s:%d" % (addr[0], addr[1]))
-                conn.send("Msg received".encode(Consts.FORMAT))
+                print("[SERVER] Connection accepted: %s:%d" % (addr[0], addr[1]))
+                conn.send("Connection accepted.".encode(Consts.FORMAT))
                 thread = threading.Thread(target=self.handle_client, args=(conn, addr))
                 thread.start()
+        except socket.error:
+            print("[SERVER] New connections are stopped.")
         except:
-            print("Error start fun in server module")
+            print("[SERVER] Error start fun in server module.")
 
     def start_server(self):
         """Metoda tworzy nowy socket i nowy wątek."""
         self.create_socket()
         self.bind_socket()
         self.running = True
-        print("[STARTING] server is starting...")
+        print("[SERVER] Server is starting...")
         threading.Thread(target=self.start).start()
 
     def stop_server(self):
         """Metoda zamyka socket servera."""
-        print("[STOP] server is stopped.")
+        print("[SERVER] Server is stopped.")
+        for connection in self.CONN_LIST.values():
+            connection.send(Consts.DISCONNECT_MESSAGE.encode(Consts.FORMAT))
+        self.CONN_LIST.clear()
+        self.running = False
         self.server_socket.close()
