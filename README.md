@@ -16,4 +16,5 @@ in new thread. GUI was created using PyQt5.
 - ![#008000](https://via.placeholder.com/15/008000?text=+) `Show a list of active connetctions`
 - ![#c5f015](https://via.placeholder.com/15/c5f015?text=+) `Show recived and send information`
 <br /> <br />
+
 ![sending-msg-img](assets/sending-message.PNG)
