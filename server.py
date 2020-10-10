@@ -1,4 +1,4 @@
-"""Moduł zawiera klasę Server."""
+"""The module contains the Server class."""
 import socket
 import threading
 
@@ -6,7 +6,7 @@ from const import Consts
 
 
 class Server:
-    """Klasa serwera zawiera metody potrzebne do obługi serwera."""
+    """The server class contains the methods needed to operate the server."""
 
     def __init__(self):
         self.running = False
@@ -14,26 +14,26 @@ class Server:
         self.recv_and_send_msg = []
 
     def create_socket(self):
-        """Metoda tworzy socket."""
+        """The method creates a socket."""
         try:
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except socket.error as msg:
             print("[SERVER] Socket creation error: " + str(msg))
 
     def bind_socket(self):
-        """Metoda binduje socket."""
+        """The method binds socket."""
         try:
             self.server_socket.bind(Consts.ADDR)
         except socket.error as msg:
             print("[SERVER] Socket binding error: " + str(msg))
 
     def send_private_msg(self, addr, conn, text):
-        """Metoda wysyła wiadomość do konkretnego użytkownika."""
+        """The method sends a message to a specific user."""
         conn.send(text.encode(Consts.FORMAT))
         self.recv_and_send_msg.append(f"[SERVER] TO CLIENT {addr}: {text}")
 
     def handle_client(self, conn, addr):
-        """Metoda utrzymuje połączenie z klientem."""
+        """The method maintains the connection with the client."""
         connected = True
         try:
             while connected:
@@ -53,7 +53,7 @@ class Server:
         conn.close()
 
     def start(self):
-        """Metoda nawiązuje połączenie z klienetem i tworzy nowe wątki."""
+        """The method provide connection to the client and creates new threads."""
         self.server_socket.listen()
         print(f"[SERVER] Server is listening on {Consts.SERVER}")
         try:
@@ -72,7 +72,7 @@ class Server:
             print("[SERVER] Error start fun in server module.")
 
     def start_server(self):
-        """Metoda tworzy nowy socket i nowy wątek."""
+        """The method creates a new socket and a new thread."""
         self.create_socket()
         self.bind_socket()
         self.running = True
@@ -80,7 +80,7 @@ class Server:
         threading.Thread(target=self.start).start()
 
     def stop_server(self):
-        """Metoda zamyka socket servera."""
+        """The method closes the server socket."""
         print("[SERVER] Server is stopped.")
         for connection in self.conn_list.values():
             connection.send(Consts.DISCONNECT_MESSAGE.encode(Consts.FORMAT))

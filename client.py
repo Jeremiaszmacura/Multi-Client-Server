@@ -1,23 +1,23 @@
-"""Moduł zawiera klasę Client."""
+"""The module contains the Client class."""
 import socket
 from const import Consts
 
 
 class Client:
-    """Klasa Client zawiera metody potrzebne do obługi klienta."""
+    """The Client class contains the methods needed to service the client."""
 
     def __init__(self):
         self.connected = False
 
     def create_socket(self):
-        """Metoda tworzy socket."""
+        """The method creates a socket."""
         try:
             self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except socket.error as msg:
             print("[CLIENT] Socket creation error: " + str(msg))
 
     def connect_socket(self):
-        """Metoda nawiązuje połączenie z serwerem."""
+        """The method connects to the server."""
         try:
             self.client.connect(Consts.ADDR)
             self.connected = True
@@ -25,7 +25,7 @@ class Client:
             print("[CLIENT] Connecting socket error: " + str(msg))
 
     def send_message(self, msg):
-        """Metoda wysyła wiadomości do serwera."""
+        """The method sends messages to the server."""
         message = msg.encode(Consts.FORMAT)
         msg_length = len(message)
         send_length = str(msg_length).encode(Consts.FORMAT)
@@ -35,7 +35,7 @@ class Client:
         print(self.client.recv(2048).decode(Consts.FORMAT))
 
     def receive_message(self):
-        """Metoda odbiera wiadomości od serwera"""
+        """The method receives messages from the server."""
         while self.connected:
             try:
                 command = self.client.recv(1024).decode(Consts.FORMAT)
@@ -49,7 +49,7 @@ class Client:
 
 
 def start_client():
-    """Metoda zawiera testowe połączenie."""
+    """The method includes a connection test."""
     client = Client()
     client.create_socket()
     client.connect_socket()

@@ -1,4 +1,4 @@
-"""Moduł zawiera głowną petlę programu."""
+"""The module contains the main program loop."""
 import threading
 import sys
 
@@ -8,7 +8,7 @@ from gui import UiMainWindow
 
 
 def start_gui():
-    """Funkcja włączająca GUI."""
+    """Enabling GUI function."""
     app = QtWidgets.QApplication(sys.argv)
     ui = UiMainWindow()
     ui.set_up_ui()
@@ -17,7 +17,7 @@ def start_gui():
 
 
 def main():
-    """Funkcja main programu"""
+    """The main function of the program."""
     threading.Thread(target=start_gui).start()
 
 

@@ -1,4 +1,4 @@
-"""Moduł zawiera klasę GUI."""
+"""The module contains a GUI class."""
 import threading
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -11,7 +11,7 @@ from const import Consts
 
 
 class UiMainWindow(object):
-    """Klasa zawiera zmienne i metody tworzące GUI."""
+    """The class contains the variables and methods that make up the GUI."""
 
     def __init__(self):
         self.MainWindow = QtWidgets.QMainWindow()
@@ -29,13 +29,14 @@ class UiMainWindow(object):
         self.server = Server()
 
     def set_up_ui(self):
-        """Metoda tworzy obiekty widgetów w odpowiednich kontenerach."""
-        # Główne okno
+        """The method creates the widget objects in the appropriate containers."""
+        # The main window
         self.MainWindow.setObjectName("MainWindow")
         self.MainWindow.setFixedSize(800, 600)
         self.widgets.setObjectName("centralwidget")
         self.MainWindow.setCentralWidget(self.widgets)
-        # Układ
+        self.MainWindow.setWindowIcon(QtGui.QIcon('assets/server.png'))
+        # Layout
         self.label_01.setStyleSheet("background-color: {}".format(Consts.LABEL_01_COLOR))
         self.layout.addWidget(self.label_01, 0, 0, 1, 1)
         self.label_02.setStyleSheet("background-color: {}".format(Consts.LABEL_02_COLOR))
@@ -51,7 +52,7 @@ class UiMainWindow(object):
         self.timer_02.timeout.connect(self.information_flow_gui_list)
         self.timer_01.start()
         self.timer_02.start()
-        # Inicjalizacja zmiennych
+        # Variable initialization
         self.on_off_button = QtWidgets.QPushButton(self.widgets)
         self.on_off_img = QtWidgets.QLabel(self.widgets)
         self.label_server = QtWidgets.QLabel(self.widgets)
@@ -60,7 +61,7 @@ class UiMainWindow(object):
         self.send_button = QtWidgets.QPushButton(self.widgets)
         self.label_client_info = QtWidgets.QLabel(self.widgets)
         self.label_information_flow = QtWidgets.QLabel(self.widgets)
-        # Wysyłanie wiadomości do klienta - label_02
+        # Sending a message to the client - label_02
         self.send_button.setGeometry(QtCore.QRect(125, 340, 150, 32))
         self.send_button.setCheckable(True)
         self.send_button.clicked.connect(self.take_send_inputs)
@@ -71,7 +72,7 @@ class UiMainWindow(object):
         self.label_client_info.setGeometry(QtCore.QRect(80, 285, 310, 32))
         self.label_client_info.setText("Send an information to client")
         self.label_client_info.setFont(QFont('Times', 16))
-        # Przycisk on-off
+        # Button on-off
         self.on_off_button.setGeometry(QtCore.QRect(80, 90, 81, 81))
         self.on_off_button.setObjectName("on_off_button")
         self.on_off_button.setIcon(QIcon("assets/icons8-shutdown-80"))
@@ -79,26 +80,26 @@ class UiMainWindow(object):
         self.on_off_button.setStyleSheet("border: none;")
         self.on_off_button.setCheckable(True)
         self.on_off_button.clicked.connect(self.server_on_off)
-        # Ikona pokazująca stan on-off
+        # Icon showing status on-off
         self.on_off_img.setGeometry(QtCore.QRect(220, 110, 81, 51))
         self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-off-80.png"))
         self.on_off_img.setObjectName("on_off_img")
-        # Napis Server
+        # Inscription Server
         self.label_server.setGeometry(QtCore.QRect(150, 15, 100, 71))
         self.font.setPointSize(26)
         self.label_server.setFont(self.font)
         self.label_server.setObjectName("label_server")
-        # Napis on-off
+        # Inscription on-off
         self.on_off_info.setGeometry(QtCore.QRect(247, 160, 41, 16))
         self.font.setPointSize(12)
         self.on_off_info.setFont(self.font)
         self.on_off_info.setObjectName("on_off_info")
-        # Pozostałe
+        # Others
         self.retranslate_ui()
         QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 
     def retranslate_ui(self):
-        """Funkcja ustawia napisy i tytuły widżetów."""
+        """The function sets the subtitles and titles of the widgets."""
         _translate = QtCore.QCoreApplication.translate
         self.MainWindow.setWindowTitle(_translate("MainWindow", "Client-Server"))
         self.on_off_button.setText(_translate("MainWindow", ""))
@@ -112,7 +113,7 @@ class UiMainWindow(object):
         self.label_04.setText(_translate("MainWindow", ""))
 
     def server_on_off(self):
-        """Metoda odpowiada za włączanie i wyłączanie serwera."""
+        """The method is responsible for turning the server on and off."""
         if self.on_off_button.isChecked():
             self.on_off_img.setPixmap(QtGui.QPixmap("assets/icons8-toggle-on-80.png"))
             _translate = QtCore.QCoreApplication.translate
@@ -125,7 +126,7 @@ class UiMainWindow(object):
             self.server.stop_server()
 
     def active_connection_list_gui(self):
-        """Metoda wyświetla listę aktywnych połączeń."""
+        """The method displays a list of active connections."""
         self.label_03.setFont(QFont('Times', 18))
         if threading.activeCount() <= 2:
             self.label_03.setText("ACTIVE CONNETCTIONS \n\n\nServer is not running")
@@ -137,7 +138,7 @@ class UiMainWindow(object):
         self.label_03.setAlignment(Qt.AlignCenter)
 
     def information_flow_gui_list(self):
-        """Metoda wyświetla listę wysłanych i odebranych wiadomości."""
+        """The method displays a list of sent and received messages."""
         self.label_04.setFont(QFont('Times', 14))
         temp_string = "Information flow\n\n"
         for msg in self.server.recv_and_send_msg:
@@ -146,7 +147,7 @@ class UiMainWindow(object):
         self.label_04.setAlignment(Qt.AlignCenter)
 
     def take_send_inputs(self):
-        """Funkcja zbiera i obsługuje dane zebrane po przysiskien Send."""
+        """The function collects and handles the data collected after the Send button."""
         if not self.on_off_button.isChecked():
             warning = QMessageBox()
             warning.setIcon(QMessageBox.Warning)

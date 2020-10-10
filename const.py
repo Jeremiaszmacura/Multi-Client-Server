@@ -1,10 +1,11 @@
 """Moduł zawiera zasoby i stałe."""
 
-
 class Consts:
-    """Przechowuje stałe."""
+    """The class holds constants."""
+    # pylint: disable=too-few-public-methods
+
     PORT = 2121
-    SERVER = '192.168.1.103'
+    SERVER = '192.168.0.220'
     ADDR = (SERVER, PORT)
     HEADER = 64
     FORMAT = 'utf-8'
